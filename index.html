@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuchipudi: The Art of Mathematical Expressions</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="floating-controls">
+        <button id="homeBtn" class="floating-btn" style="display:none;">🏠 Home</button>
+    </div>
+
+    <!-- Home Page Layout (Title Top, 2 Columns Below) -->
+    <div id="homePage" class="home-container">
+        
+        <!-- Center Top Title -->
+        <div class="home-top-header">
+            <h1>KUCHIPUDI: The Art of Mathematical Expressions</h1>
+            <p>(Where Art, Geometry, Rhythm, and Expression Unite)</p>
+        </div>
+
+        <div class="home-body">
+            <!-- Left Column: Dancer -->
+            <div class="home-left">
+                <div class="sparkle" style="top: 28%; left: 47.5%;"></div>
+                <div class="sparkle" style="top: 28%; left: 52.5%;"></div>
+                <img src="images/dancer_bg.png" alt="Kuchipudi Dancer" class="dancer-bg">
+                <div class="particles"></div>
+                <div class="stage-lighting"></div>
+            </div>
+
+            <!-- Right Column: Navigation -->
+            <div class="home-right">
+                <nav id="sidebarHome">
+                    <h2>CONTEXT</h2>
+                    <ul id="navListHome" class="vertical-nav">
+                        <li data-target="intro">1. Introduction to Kuchipudi</li>
+                        <li data-target="asamyutha">2. Asamyutha Hastas</li>
+                        <li data-target="samyutha">3. Samyutha Hastas</li>
+                        <li data-target="math-asamyutha">4. Mathematical Harmony in Asamyutha Hastas</li>
+                        <li data-target="math-samyutha">5. Mathematical Harmony in Samyutha Hastas</li>
+                        <li data-target="non-math">6. Non-Mathematical Dimensions of Mudras</li>
+                        <li data-target="equations">7. The Dancing Equations</li>
+                        <li data-target="fusion">8. The Fusion of Subjects and Traditions</li>
+                        <li data-target="conclusion">9. Conclusion</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Pages Layout (Full Width) -->
+    <div id="contentPage" class="content-container" style="display: none;">
+        <main id="contentArea">
+            <!-- Content injected via JS -->
+        </main>
+    </div>
+
+    <!-- Math Explanation Modal -->
+    <div id="mathModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="closeModal" class="close-btn">&times;</button>
+            <div class="modal-body">
+                <div class="modal-visual-container">
+                    <div id="animationLabel" class="animation-label"></div>
+                    <img id="modalMudraImg" src="" alt="Mudra">
+                    <div id="animationOverlay" class="animation-overlay"></div>
+                </div>
+                <div class="modal-info-panel">
+                    <h2 id="modalMudraName">Mudra Name</h2>
+                    <p id="modalMudraPlacement" class="mudra-placement-text"></p>
+                    <div class="math-detail-section">
+                        <h3>Mathematical Analysis</h3>
+                        <div id="modalMathContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

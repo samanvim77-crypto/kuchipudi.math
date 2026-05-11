@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NatyaGanitha - Enter Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --black: #000000;
+            --cinzel: 'Cinzel', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--black);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: var(--cinzel);
+        }
+
+        .experience-container {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .welcome-text {
+            color: var(--gold);
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 15px;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeIn 2s forwards 1s;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .enter-btn {
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-family: var(--cinzel);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            border-radius: 50px;
+            opacity: 0;
+            animation: fadeIn 2s forwards 2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enter-btn:hover {
+            background: var(--gold);
+            color: var(--black);
+            box-shadow: 0 0 50px var(--gold);
+            transform: scale(1.1);
+        }
+
+        .bg-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, var(--black) 90%);
+            z-index: 1;
+        }
+
+        /* Ambient particles for background */
+        .ambient-particle {
+            position: absolute;
+            background: var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.15;
+            filter: blur(2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-50px) translateX(30px); }
+            50% { transform: translateY(-20px) translateX(-40px); }
+            75% { transform: translateY(-80px) translateX(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-video-overlay"></div>
+    <div id="particles"></div>
+
+    <div class="experience-container">
+        <p class="welcome-text">WELCOME TO</p>
+        <h1 class="title">NATYAGANITAM</h1>
+        <button class="enter-btn" onclick="enterSite()">Enter Experience</button>
+    </div>
+
+    <script>
+        function enterSite() {
+            window.location.href = 'index.html';
+        }
+
+        // Simple background particles
+        function createAmbientParticles() {
+            const container = document.getElementById('particles');
+            for(let i=0; i<30; i++) {
+                const p = document.createElement('div');
+                p.className = 'ambient-particle';
+                const size = Math.random() * 10 + 5;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animation = `float ${Math.random() * 10 + 10}s infinite ease-in-out`;
+                container.appendChild(p);
+            }
+        }
+        createAmbientParticles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NatyaGanitha - Login / Register</title>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="split-container">
+        <!-- Left Side: Cinematic Visual -->
+        <div class="left-side">
+            <div class="particles-container" id="particles"></div>
+            <div class="smoke-overlay"></div>
+            <div class="statue-wrapper">
+                <div class="statue-circle">
+                    <!-- The user will place their image here. Using a placeholder for now. -->
+                    <img src="images/nataraja_statue.jpg" alt="Nataraja Statue" id="natarajaImg">
+                </div>
+                <div class="statue-glow"></div>
+            </div>
+            <div class="cinematic-text">
+                <h1 class="gold-title">NatyaGanitam</h1>
+                <p class="gold-subtitle">— A journey where rhythm, symmetry, devotion, and dance become one.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Auth Form -->
+        <div class="right-side">
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                    <button class="tab-btn" onclick="switchTab('register')">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <div id="login-form" class="form-content">
+                    <h2>Welcome Back</h2>
+                    <form onsubmit="event.preventDefault(); handleAuth('login');">
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="login-pass" placeholder="Enter your password" required>
+                                <i class="fas fa-eye toggle-password" onclick="togglePassword('login-pass')"></i>
+                            </div>
+                        </div>
+                        <div class="form-options">
+                            <label class="remember-me">
+                                <input type="checkbox"> Remember Me
+                            </label>
+                            <a href="#" class="forgot-link">Forgot Password?</a>
+                        </div>
+                        <button type="submit" class="gold-btn">Login</button>
+                    </form>
+                    <div class="divider"><span>OR</span></div>
+                    <button class="google-btn">
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="form-content hidden">
+                    <h2>Create Account</h2>
+                    <form onsubmit="event.preventDefault(); handleAuth('register');">
+                        <div class="input-group">
+                            <label>Name</label>
+                            <input type="text" placeholder="Your full name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="Your email address" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="reg-pass" placeholder="Create password" required>
+                                <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-pass')"></i>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Confirm Password</label>
+                            <input type="password" id="reg-confirm-pass" placeholder="Repeat password" required>
+                        </div>
+                        <button type="submit" class="gold-btn">Register for Free</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js?v=2"></script>
+</body>
+</html>
