@@ -20,19 +20,22 @@ body {
     color: #fff;
     font-family: var(--lora);
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
 }
 
 .split-container {
     display: flex;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* Left Side Styles */
 .left-side {
     width: 50%;
-    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     position: relative;
     background-color: var(--black);
     display: flex;
@@ -140,7 +143,8 @@ body {
 /* Right Side Styles */
 .right-side {
     width: 50%;
-    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     background: radial-gradient(circle at center, #1a1a1a 0%, var(--black) 100%);
     display: flex;
     justify-content: center;
@@ -331,19 +335,78 @@ body {
     gap: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .google-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
     color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(66, 133, 244, 0.2);
 }
 
-/* Mobile Responsiveness */
+.google-btn:active {
+    transform: translateY(0);
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.google-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Toast notification */
+.auth-toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: #fff;
+    font-family: var(--lora);
+    font-size: 0.95rem;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.auth-toast .toast-icon {
+    font-size: 1.2rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE — ALL DEVICES
+   ═══════════════════════════════════════════════════════ */
+
+/* Tablet Landscape (993px – 1199px) */
+@media (max-width: 1199px) {
+    .gold-title    { font-size: 2.8rem; }
+    .gold-subtitle { font-size: 1rem; }
+    .statue-circle { width: 280px; height: 280px; }
+}
+
+/* Tablet Portrait (768px – 992px) */
 @media (max-width: 992px) {
-    .split-container {
-        flex-direction: column;
-    }
+    .split-container { flex-direction: column; }
 
     .left-side, .right-side {
         width: 100%;
@@ -353,44 +416,79 @@ body {
     }
 
     .left-side {
-        padding-top: 80px;
-        padding-bottom: 40px;
+        padding-top: 60px;
+        padding-bottom: 30px;
+        min-height: 45vh;
     }
 
-    .statue-circle {
-        width: 280px;
-        height: 280px;
-    }
+    .right-side { padding: 20px 20px 60px; }
 
-    .gold-title {
-        font-size: 2.2rem;
-    }
+    .statue-circle { width: 240px; height: 240px; }
+    .gold-title    { font-size: 2.2rem; }
+    .gold-subtitle { font-size: 0.95rem; }
 
-    .right-side {
-        padding-top: 20px;
-        padding-bottom: 80px;
-    }
-
-    .auth-card {
-        max-width: 100%;
-        margin: 0 auto;
-    }
+    .auth-card { max-width: 100%; }
 }
 
-@media (max-width: 480px) {
-    .statue-circle {
-        width: 220px;
-        height: 220px;
-    }
+/* Mobile Landscape (576px – 767px) */
+@media (max-width: 767px) {
+    .statue-circle { width: 200px; height: 200px; }
+    .gold-title    { font-size: 1.9rem; }
+    .auth-card     { padding: 28px 20px; }
 
-    .gold-title {
-        font-size: 1.8rem;
-    }
-
-    .gold-subtitle {
-        font-size: 1rem;
-    }
+    .form-content h2 { font-size: 1.6rem; }
+    .gold-btn        { padding: 12px; font-size: 0.95rem; }
 }
+
+/* Mobile Portrait (up to 575px) */
+@media (max-width: 575px) {
+    .left-side {
+        padding-top: 40px;
+        padding-bottom: 20px;
+        min-height: 38vh;
+    }
+
+    .statue-circle { width: 160px; height: 160px; }
+    .gold-title    { font-size: 1.5rem; letter-spacing: 1px; }
+    .gold-subtitle { font-size: 0.85rem; }
+    .cinematic-text { margin-top: 12px; }
+
+    .auth-card  { padding: 22px 16px; border-radius: 16px; }
+    .auth-tabs  { gap: 12px; margin-bottom: 20px; }
+    .tab-btn    { font-size: 0.95rem; }
+
+    .input-group        { margin-bottom: 14px; }
+    .input-group input  { padding: 10px 12px; font-size: 0.9rem; }
+    .form-content h2    { font-size: 1.4rem; margin-bottom: 18px; }
+
+    .gold-btn    { padding: 12px; font-size: 0.9rem; letter-spacing: 0.5px; }
+    .google-btn  { padding: 11px; font-size: 0.85rem; }
+    .google-icon { width: 18px; height: 18px; }
+
+    .form-options       { font-size: 0.78rem; }
+    .forgot-link        { font-size: 0.78rem; }
+
+    .auth-toast { width: 90%; font-size: 0.85rem; padding: 12px 16px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+    .statue-circle { width: 130px; height: 130px; }
+    .gold-title    { font-size: 1.2rem; }
+    .left-side     { min-height: 32vh; }
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+    .gold-btn:hover, .google-btn:hover { transform: none; }
+    .gold-btn, .google-btn, .tab-btn   { min-height: 44px; }
+}
+
+/* Safe area (iPhone notch) */
+@supports (padding: env(safe-area-inset-bottom)) {
+    .right-side { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+
 
 .hidden {
     display: none;

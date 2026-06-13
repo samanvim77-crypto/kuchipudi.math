@@ -26,7 +26,7 @@ h1, h2, h3, h4, .cinzel {
     font-family: 'Cinzel', serif;
 }
 
-/* Floating Controls */
+/* ── Floating Controls ───────────────────────────────────────── */
 .floating-controls {
     position: fixed;
     top: 20px;
@@ -34,6 +34,67 @@ h1, h2, h3, h4, .cinzel {
     z-index: 2000;
     display: flex;
     gap: 15px;
+    align-items: center;
+}
+
+.floating-controls-right {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    gap: 15px;
+}
+
+.breadcrumb-nav {
+    color: var(--cream);
+    font-size: 1.1rem;
+    font-family: 'Cinzel', serif;
+    background: var(--glass-bg);
+    padding: 10px 20px;
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.breadcrumb-nav span {
+    color: var(--gold);
+}
+
+.page-nav-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--maroon);
+}
+
+.nav-btn {
+    background: var(--glass-bg);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: var(--gold);
+    color: var(--black);
+    box-shadow: 0 0 15px var(--gold);
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: gray;
+    color: gray;
 }
 
 .floating-btn {
@@ -55,7 +116,7 @@ h1, h2, h3, h4, .cinzel {
     box-shadow: 0 0 15px var(--gold);
 }
 
-/* Intro Overlay */
+/* ── Intro Overlay ───────────────────────────────────────────── */
 .overlay {
     position: fixed;
     top: 0;
@@ -104,7 +165,7 @@ h1, h2, h3, h4, .cinzel {
     box-shadow: 0 0 15px var(--gold);
 }
 
-/* Home Container - 2 Columns + Top Header */
+/* ── Home Container — 2 Columns + Top Header ─────────────────── */
 .home-container {
     width: 100vw;
     height: 100vh;
@@ -124,17 +185,19 @@ h1, h2, h3, h4, .cinzel {
     background: radial-gradient(circle, var(--dark-maroon) 0%, var(--black) 100%);
     border-bottom: 2px solid var(--gold);
     z-index: 10;
+    /* Ensure header text is always readable */
+    padding: 0 16px;
 }
 
 .home-top-header h1 {
     color: var(--gold);
-    font-size: 2.5rem;
+    font-size: clamp(1.1rem, 2.5vw, 2.5rem); /* fluid: never wraps awkwardly */
     text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
     margin-bottom: 5px;
 }
 
 .home-top-header p {
-    font-size: 1.2rem;
+    font-size: clamp(0.75rem, 1.4vw, 1.2rem);
     color: var(--cream);
     font-style: italic;
 }
@@ -145,31 +208,48 @@ h1, h2, h3, h4, .cinzel {
     height: 85vh;
 }
 
+/* ── Left Column: Video ──────────────────────────────────────── */
 .home-left {
     width: 50%;
     height: 100%;
     position: relative;
     border-right: 2px solid var(--maroon);
+    /* Clip the video to the column bounds */
+    overflow: hidden;
+    background-color: var(--black); /* shows while video loads */
 }
 
-.dancer-bg {
+/*
+ * .dancer-video
+ * ─────────────
+ * Replaces the old .dancer-bg img.
+ *
+ * object-fit: cover  →  fills the entire column without letter-boxing,
+ *                        matching the feel of the original image.
+ * width/height 100%  →  always fills the container regardless of
+ *                        viewport size or device orientation.
+ * position absolute  →  layers behind .particles and .stage-lighting.
+ * animation          →  preserves the original slow-zoom effect.
+ */
+.dancer-video {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-    animation: slowZoom 20s infinite alternate;
-    filter: brightness(1.1) contrast(0.9) saturate(1.1) sepia(0.1);
-}
-
-.dancer-bg:hover {
-    transform: scale(1.05);
+    object-fit: contain;     /* fit perfectly without cropping */
+    object-position: center; /* keep the dancer centred */
+    /* No pointer-events needed — video is decorative */
+    pointer-events: none;
+    transition: opacity 0.5s ease;
 }
 
 @keyframes slowZoom {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.1); }
+    0%   { transform: scale(1);   }
+    100% { transform: scale(1.08); } /* slightly reduced from 1.1 so cover stays covered */
 }
 
+/* Overlay layers sit on top of the video */
 .particles {
     position: absolute;
     top: 0;
@@ -179,10 +259,11 @@ h1, h2, h3, h4, .cinzel {
     background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(0,0,0,0) 70%);
     pointer-events: none;
     animation: pulseLight 4s infinite alternate;
+    z-index: 1;
 }
 
 @keyframes pulseLight {
-    0% { opacity: 0.3; }
+    0%   { opacity: 0.3; }
     100% { opacity: 0.8; }
 }
 
@@ -193,8 +274,10 @@ h1, h2, h3, h4, .cinzel {
     height: 40%;
     background: linear-gradient(to top, var(--black), transparent);
     pointer-events: none;
+    z-index: 2;
 }
 
+/* ── Right Column: Navigation ────────────────────────────────── */
 .home-right {
     width: 50%;
     height: 100%;
@@ -253,7 +336,7 @@ h1, h2, h3, h4, .cinzel {
     transform: translateX(10px);
 }
 
-/* Content Pages Layout */
+/* ── Content Pages Layout ────────────────────────────────────── */
 .content-container {
     width: 100vw;
     height: 100vh;
@@ -289,7 +372,7 @@ h1, h2, h3, h4, .cinzel {
     font-size: 1.1rem;
 }
 
-/* Mudra Grid */
+/* ── Mudra Grid ──────────────────────────────────────────────── */
 .mudra-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -305,6 +388,7 @@ h1, h2, h3, h4, .cinzel {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .mudra-card:hover {
@@ -371,7 +455,6 @@ h1, h2, h3, h4, .cinzel {
     color: var(--black);
 }
 
-/* Math Info Box below pronounce */
 .math-info-box {
     margin-top: 15px;
     padding-top: 15px;
@@ -391,6 +474,7 @@ h1, h2, h3, h4, .cinzel {
     font-size: 0.95rem;
 }
 
+/* ── Equations Section ───────────────────────────────────────── */
 .equations-section {
     display: flex;
     flex-direction: column;
@@ -404,6 +488,7 @@ h1, h2, h3, h4, .cinzel {
     padding: 20px;
     align-items: center;
     gap: 20px;
+    cursor: pointer;
 }
 
 .equation-visual {
@@ -420,6 +505,7 @@ h1, h2, h3, h4, .cinzel {
     flex-shrink: 0;
 }
 
+/* ── Subject Fusion ──────────────────────────────────────────── */
 .subject-fusion {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -439,6 +525,7 @@ h1, h2, h3, h4, .cinzel {
     margin-bottom: 15px;
 }
 
+/* ── Conclusion ──────────────────────────────────────────────── */
 .conclusion-box {
     text-align: center;
     padding: 60px;
@@ -455,7 +542,7 @@ h1, h2, h3, h4, .cinzel {
     font-family: 'Cinzel', serif;
 }
 
-/* Modal Overlay */
+/* ── Modal Overlay ───────────────────────────────────────────── */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -565,7 +652,7 @@ h1, h2, h3, h4, .cinzel {
     border-left: 4px solid var(--gold);
 }
 
-/* Animations - SVG Styles */
+/* ── Animations — SVG Styles ─────────────────────────────────── */
 .math-svg-overlay {
     width: 100%;
     height: 100%;
@@ -599,13 +686,13 @@ h1, h2, h3, h4, .cinzel {
 
 @keyframes pulsePoint {
     from { r: 5; opacity: 0.5; }
-    to { r: 10; opacity: 1; }
+    to   { r: 10; opacity: 1; }
 }
 
 @keyframes sequenceFadeFull {
-    0%, 2% { opacity: 0; }
+    0%,  2% { opacity: 0; }
     8%, 92% { opacity: 1; }
-    98%, 100% { opacity: 0; }
+    98%,100% { opacity: 0; }
 }
 
 .combined-label {
@@ -616,9 +703,9 @@ h1, h2, h3, h4, .cinzel {
 }
 
 @keyframes sequenceFade {
-    0%, 5% { opacity: 0; }
+    0%,  5% { opacity: 0; }
     15%, 85% { opacity: 1; }
-    95%, 100% { opacity: 0; }
+    95%,100% { opacity: 0; }
 }
 
 .animation-label {
@@ -641,11 +728,12 @@ h1, h2, h3, h4, .cinzel {
 }
 
 @keyframes labelFade {
-    0%, 5% { opacity: 0; transform: translate(-50%, -10px); }
+    0%,  5% { opacity: 0; transform: translate(-50%, -10px); }
     15%, 85% { opacity: 1; transform: translate(-50%, 0); }
-    95%, 100% { opacity: 0; transform: translate(-50%, -10px); }
+    95%,100% { opacity: 0; transform: translate(-50%, -10px); }
 }
 
+/* ── Sparkles ────────────────────────────────────────────────── */
 .sparkle {
     position: absolute;
     width: 3px;
@@ -659,10 +747,11 @@ h1, h2, h3, h4, .cinzel {
 }
 
 @keyframes sparklePulse {
-    0% { transform: scale(0.3); opacity: 0.4; }
+    0%   { transform: scale(0.3); opacity: 0.4; }
     100% { transform: scale(1.2); opacity: 1; }
 }
 
+/* ── Conclusion Extended ─────────────────────────────────────── */
 .conclusion-extended-info {
     margin-top: 30px;
     text-align: left;
@@ -702,6 +791,7 @@ h1, h2, h3, h4, .cinzel {
     60% { transform: translateY(-10px); }
 }
 
+/* ── Thank-You Overlay ───────────────────────────────────────── */
 .thank-you-overlay {
     position: fixed;
     top: 0;
@@ -720,14 +810,6 @@ h1, h2, h3, h4, .cinzel {
     animation: lotusBloom 2s ease-out;
 }
 
-.namaste-text {
-    font-size: 5rem;
-    color: var(--gold);
-    font-family: 'Cinzel', serif;
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-    margin-bottom: 10px;
-}
-
 .lotus-icon {
     font-size: 4rem;
     margin-top: 20px;
@@ -735,37 +817,13 @@ h1, h2, h3, h4, .cinzel {
 }
 
 @keyframes lotusBloom {
-    0% { transform: scale(0.5); opacity: 0; filter: blur(10px); }
-    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+    0%   { transform: scale(0.5); opacity: 0; filter: blur(10px); }
+    100% { transform: scale(1);   opacity: 1; filter: blur(0); }
 }
 
 @keyframes rotateLotus {
     from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.subject-icon-circle {
-    width: 50px;
-    height: 50px;
-    background: var(--dark-maroon);
-    border: 2px solid var(--gold);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-}
-
-.interactive-thank-you {
-    transition: all 0.5s ease;
-    cursor: default;
-}
-
-.interactive-thank-you:hover {
-    transform: scale(1.1);
-    text-shadow: 0 0 50px var(--gold), 0 0 100px var(--gold);
-    letter-spacing: 5px;
+    to   { transform: rotate(360deg); }
 }
 
 .subject-icon-circle {
@@ -799,6 +857,102 @@ h1, h2, h3, h4, .cinzel {
     filter: drop-shadow(0 0 20px #fff);
 }
 
-.mudra-card {
-    cursor: pointer;
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet landscape / small desktop (≤ 1024px) ──────────────── */
+@media (max-width: 1024px) {
+    .home-top-header h1 { font-size: clamp(1rem, 2vw, 2rem); }
+    #sidebarHome { width: 90%; padding: 20px; }
+    .vertical-nav li { font-size: 0.9rem; padding: 12px; }
+}
+
+/* ── Tablet portrait (≤ 768px) — stack columns vertically ──────── */
+@media (max-width: 768px) {
+    .home-body {
+        flex-direction: column;   /* video on top, nav below */
+    }
+
+    .home-left {
+        width: 100%;
+        height: 45%;             /* Fix: use % so it fits within .home-body */
+        border-right: none;
+        border-bottom: 2px solid var(--maroon);
+    }
+
+    .home-right {
+        width: 100%;
+        height: 55%;             /* Fix: use % */
+        overflow-y: auto;
+    }
+
+    #sidebarHome {
+        width: 95%;
+        max-height: none;         /* let it scroll inside .home-right */
+        margin: 10px auto;
+    }
+
+    .section-title { font-size: 2rem; }
+
+    .modal-body { flex-direction: column; }
+    .modal-visual-container,
+    .modal-info-panel { width: 100%; height: 50%; }
+    .modal-info-panel { padding: 20px; }
+}
+
+/* ── Mobile (≤ 480px) ───────────────────────────────────────── */
+@media (max-width: 480px) {
+    .home-top-header {
+        height: auto;
+        padding: 60px 10px 12px; /* Extra top padding to avoid floating button overlap */
+    }
+
+    .home-top-header h1 { font-size: 1rem; }
+    .home-top-header p  { font-size: 0.7rem; }
+
+    .home-left  { height: 40%; }
+    .home-right { height: 60%; }
+
+    .vertical-nav li { font-size: 0.82rem; padding: 10px; }
+
+    .section-title { font-size: 1.5rem; }
+
+    .content-container { padding: 60px 5%; }
+    
+    .equation-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .conclusion-box { padding: 30px 15px; }
+    .quote { font-size: 1.3rem; }
+
+    .mudra-grid {
+        grid-template-columns: 1fr; /* single column on phones */
+    }
+
+    .thank-you-text { font-size: 3rem; letter-spacing: 8px; }
+}
+
+/* ── Very small phones (≤ 360px) ────────────────────────────── */
+@media (max-width: 360px) {
+    .home-top-header h1 { font-size: 0.85rem; }
+    .home-left { height: 35vh; }
+}
+
+/* ── Landscape mobile (height < 500px) ──────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+    .home-container { height: auto; min-height: 100vh; }
+
+    .home-top-header { height: auto; padding: 8px; }
+
+    .home-body {
+        flex-direction: row;      /* restore side-by-side in landscape */
+        height: auto;
+        min-height: calc(100vh - 60px);
+    }
+
+    .home-left  { width: 50%; height: calc(100vh - 60px); }
+    .home-right { width: 50%; height: calc(100vh - 60px); overflow-y: auto; }
 }

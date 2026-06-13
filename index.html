@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        if (!sessionStorage.getItem('natyaAuth')) {
+            window.location.replace('login.html');
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuchipudi: The Art of Mathematical Expressions</title>
     <link rel="stylesheet" href="style.css">
@@ -10,11 +15,15 @@
 <body>
     <div class="floating-controls">
         <button id="homeBtn" class="floating-btn" style="display:none;">🏠 Home</button>
+        <div id="breadcrumbNav" class="breadcrumb-nav" style="display:none;"></div>
+    </div>
+    <div class="floating-controls-right">
+        <button id="logoutBtn" class="floating-btn" onclick="logout()">🚪 Logout</button>
     </div>
 
     <!-- Home Page Layout (Title Top, 2 Columns Below) -->
     <div id="homePage" class="home-container">
-        
+
         <!-- Center Top Title -->
         <div class="home-top-header">
             <h1>KUCHIPUDI: The Art of Mathematical Expressions</h1>
@@ -22,11 +31,16 @@
         </div>
 
         <div class="home-body">
-            <!-- Left Column: Dancer -->
+            <!-- Left Column: Dancer VIDEO (replaces the static image) -->
             <div class="home-left">
                 <div class="sparkle" style="top: 28%; left: 47.5%;"></div>
                 <div class="sparkle" style="top: 28%; left: 52.5%;"></div>
-                <img src="images/dancer_bg.png" alt="Kuchipudi Dancer" class="dancer-bg">
+
+                <video id="bgVideo" class="dancer-video" autoplay loop muted playsinline>
+                    <source src="images/shorts_video.mp4" type="video/mp4">
+                    <img src="images/kuchipudi_dancer_classical.png" alt="Classical Kuchipudi Dancer" class="dancer-video">
+                </video>
+
                 <div class="particles"></div>
                 <div class="stage-lighting"></div>
             </div>

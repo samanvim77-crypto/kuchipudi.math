@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        if (!sessionStorage.getItem('natyaAuth')) {
+            window.location.replace('login.html');
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NatyaGanitha - Enter Experience</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -105,6 +110,26 @@
             50% { transform: translateY(-20px) translateX(-40px); }
             75% { transform: translateY(-80px) translateX(20px); }
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title       { font-size: 2.8rem; letter-spacing: 8px; }
+            .enter-btn   { padding: 16px 36px; font-size: 1.2rem; }
+            .welcome-text{ font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            .title        { font-size: 2rem; letter-spacing: 5px; margin-bottom: 30px; }
+            .enter-btn    { padding: 14px 28px; font-size: 1rem; letter-spacing: 2px; border-radius: 30px; }
+            .welcome-text { font-size: 1rem; letter-spacing: 3px; }
+        }
+        @media (max-width: 360px) {
+            .title     { font-size: 1.6rem; letter-spacing: 3px; }
+            .enter-btn { font-size: 0.9rem; padding: 12px 22px; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            .enter-btn:hover { transform: none; box-shadow: none; }
+            .enter-btn { min-height: 52px; }
+        }
     </style>
 </head>
 <body>
@@ -119,6 +144,8 @@
 
     <script>
         function enterSite() {
+            // Ensure auth flag is set before entering main site
+            sessionStorage.setItem('natyaAuth', 'true');
             window.location.href = 'index.html';
         }
 

@@ -7,8 +7,57 @@
     <link rel="stylesheet" href="login.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!--
+    ╔══════════════════════════════════════════════════════════╗
+    ║           GOOGLE OAUTH SETUP — READ THIS FIRST          ║
+    ╠══════════════════════════════════════════════════════════╣
+    ║ 1. Go to https://console.cloud.google.com/              ║
+    ║ 2. Create a project (or select an existing one)         ║
+    ║ 3. APIs & Services → Credentials → Create Credentials   ║
+    ║    → OAuth 2.0 Client ID → Web application             ║
+    ║ 4. Under "Authorised JavaScript origins" add:           ║
+    ║    • http://localhost  (for local dev)                  ║
+    ║    • https://yourdomain.com  (for production)           ║
+    ║ 5. Copy the Client ID and paste it below in TWO places: ║
+    ║    • data-client_id attribute on #g_id_onload div       ║
+    ║    • The YOUR_GOOGLE_CLIENT_ID constant in login.js     ║
+    ╚══════════════════════════════════════════════════════════╝
+    -->
+
+    <!-- Google Identity Services (GIS) library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <style>
+        /* ── Google button wrapper ── */
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        /* Override GIS default button to feel at home in the dark theme */
+        .google-btn-wrapper iframe {
+            border-radius: 8px !important;
+            overflow: hidden;
+        }
+
+        /* Fallback message when GIS hasn't rendered yet */
+        .gsi-loading-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 6px;
+        }
+    </style>
 </head>
 <body>
+    <!--
+        GIS One-Tap + popup sign-in initialisation.
+        Replace YOUR_GOOGLE_CLIENT_ID with your actual Client ID.
+        data-callback must match the function name in login.js.
+    -->
+
     <div class="split-container">
         <!-- Left Side: Cinematic Visual -->
         <div class="left-side">
@@ -16,7 +65,6 @@
             <div class="smoke-overlay"></div>
             <div class="statue-wrapper">
                 <div class="statue-circle">
-                    <!-- The user will place their image here. Using a placeholder for now. -->
                     <img src="images/nataraja_statue.jpg" alt="Nataraja Statue" id="natarajaImg">
                 </div>
                 <div class="statue-glow"></div>
@@ -35,7 +83,7 @@
                     <button class="tab-btn" onclick="switchTab('register')">Register</button>
                 </div>
 
-                <!-- Login Form -->
+                <!-- ── LOGIN FORM ── -->
                 <div id="login-form" class="form-content">
                     <h2>Welcome Back</h2>
                     <form onsubmit="event.preventDefault(); handleAuth('login');">
@@ -58,13 +106,26 @@
                         </div>
                         <button type="submit" class="gold-btn">Login</button>
                     </form>
+
                     <div class="divider"><span>OR</span></div>
-                    <button class="google-btn">
+
+                    <!--
+                        GIS renders the real Google Sign-In button here.
+                        data-width is capped at the card width (~370 px).
+                        data-theme="filled_black" matches the dark UI.
+                    -->
+                    <button class="google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: black; border: 1px solid #ccc; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="handleGoogleSignIn()">
+                        <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
                         Sign in with Google
                     </button>
                 </div>
 
-                <!-- Register Form -->
+                <!-- ── REGISTER FORM ── -->
                 <div id="register-form" class="form-content hidden">
                     <h2>Create Account</h2>
                     <form onsubmit="event.preventDefault(); handleAuth('register');">
@@ -89,11 +150,27 @@
                         </div>
                         <button type="submit" class="gold-btn">Register for Free</button>
                     </form>
+
+                    <div class="divider"><span>OR</span></div>
+
+                    <!-- Google button on Register tab too -->
+                    <div class="google-btn-wrapper">
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="filled_black"
+                             data-text="signup_with"
+                             data-size="large"
+                             data-logo_alignment="left"
+                             data-width="370">
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <script src="login.js?v=2"></script>
+    <script src="login.js?v=4"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const homeBtn = document.getElementById('homeBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const homePage = document.getElementById('homePage');
     const contentPage = document.getElementById('contentPage');
     const contentArea = document.getElementById('contentArea');
@@ -10,7 +11,35 @@ document.addEventListener('DOMContentLoaded', () => {
         contentPage.style.display = 'none';
         homePage.style.display = 'flex';
         homeBtn.style.display = 'none';
+        const breadcrumbNav = document.getElementById('breadcrumbNav');
+        if (breadcrumbNav) breadcrumbNav.style.display = 'none';
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.style.display = 'block';
     });
+
+    // Video Crossfade for smooth looping
+    const bgVideo = document.getElementById('bgVideo');
+    if (bgVideo) {
+        bgVideo.addEventListener('timeupdate', () => {
+            const fadeDuration = 0.5; // seconds
+            const timeLeft = bgVideo.duration - bgVideo.currentTime;
+            
+            // Fade out at the end, fade in at the beginning
+            if (timeLeft < fadeDuration) {
+                bgVideo.style.opacity = Math.max(0, timeLeft / fadeDuration);
+            } else if (bgVideo.currentTime < fadeDuration) {
+                bgVideo.style.opacity = Math.min(1, bgVideo.currentTime / fadeDuration);
+            } else {
+                bgVideo.style.opacity = 1;
+            }
+        });
+    }
+
+    // Logout Functionality
+    window.logout = function() {
+        sessionStorage.removeItem('natyaAuth');
+        window.location.replace('login.html');
+    };
 
     // Navigation from Home SideBar
     navItemsHome.forEach(item => {
@@ -29,16 +58,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalMathContent = document.getElementById('modalMathContent');
     const animationOverlay = document.getElementById('animationOverlay');
 
+    const breadcrumbNav = document.getElementById('breadcrumbNav');
+    
+    // Build an array of sections for next/prev navigation
+    const sections = Array.from(navItemsHome).map(item => ({
+        target: item.dataset.target,
+        title: item.textContent.replace(/^\d+\.\s*/, '') // Remove numbering for cleaner UI
+    }));
+
     // Section Content Generator
     function loadSection(target) {
         // Hide home page, show content page
         homePage.style.display = 'none';
         contentPage.style.display = 'block';
         homeBtn.style.display = 'block';
+        if (breadcrumbNav) breadcrumbNav.style.display = 'flex';
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.style.display = 'none';
+
+        // Update Breadcrumb
+        const currentSection = sections.find(s => s.target === target);
+        if (breadcrumbNav && currentSection) {
+            breadcrumbNav.innerHTML = `<span>Home</span> &gt; ${currentSection.title}`;
+        }
 
         contentArea.style.opacity = 0;
         setTimeout(() => {
-            contentArea.innerHTML = getHTMLForSection(target);
+            // Get section content and append Next/Prev buttons
+            contentArea.innerHTML = getHTMLForSection(target) + getNavigationButtons(target);
             contentPage.scrollTop = 0;
             contentArea.style.opacity = 1;
             
@@ -72,7 +120,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (eq) openEquationModal(eq);
                 });
             });
+
+            // Bind Next/Prev button events
+            const prevBtn = document.getElementById('prevSectionBtn');
+            const nextBtn = document.getElementById('nextSectionBtn');
+            if (prevBtn) prevBtn.addEventListener('click', () => loadSection(prevBtn.dataset.target));
+            if (nextBtn) nextBtn.addEventListener('click', () => loadSection(nextBtn.dataset.target));
+
         }, 100);
+    }
+
+    function getNavigationButtons(currentTarget) {
+        const index = sections.findIndex(s => s.target === currentTarget);
+        if (index === -1) return '';
+
+        const prev = index > 0 ? sections[index - 1] : null;
+        const next = index < sections.length - 1 ? sections[index + 1] : null;
+
+        let html = '<div class="page-nav-controls">';
+        if (prev) {
+            html += `<button id="prevSectionBtn" class="nav-btn" data-target="${prev.target}">&#8592; Previous: ${prev.title}</button>`;
+        } else {
+            html += `<button class="nav-btn" disabled>&#8592; Previous</button>`;
+        }
+
+        if (next) {
+            html += `<button id="nextSectionBtn" class="nav-btn" data-target="${next.target}">Next: ${next.title} &#8594;</button>`;
+        } else {
+            html += `<button class="nav-btn" disabled>Next &#8594;</button>`;
+        }
+        html += '</div>';
+
+        return html;
     }
 
     function openEquationModal(eq) {
@@ -227,10 +306,34 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.setAttribute("class", "math-svg-overlay");
         animationOverlay.appendChild(svg);
 
-        const durationPerStep = 8;
+        const durationPerStep = 6; // Snappier duration
         const totalConcepts = mudra.math.length;
         const totalSteps = totalConcepts + 1; // +1 for the combined view
         const totalDuration = totalSteps * durationPerStep;
+        
+        // Dynamic Keyframes to ensure ZERO overlap
+        const pStep = 100 / totalSteps;
+        const pFadeIn = pStep * 0.1;
+        const pFadeOut = pStep * 0.9;
+
+        const dynamicStyle = document.createElement('style');
+        dynamicStyle.innerHTML = `
+            @keyframes dynamicSequenceFade {
+                0% { opacity: 0; }
+                ${pFadeIn}% { opacity: 1; }
+                ${pFadeOut}% { opacity: 1; }
+                ${pStep}% { opacity: 0; }
+                100% { opacity: 0; }
+            }
+            @keyframes dynamicLabelFade {
+                0% { opacity: 0; transform: translate(-50%, -10px); }
+                ${pFadeIn}% { opacity: 1; transform: translate(-50%, 0); }
+                ${pFadeOut}% { opacity: 1; transform: translate(-50%, 0); }
+                ${pStep}% { opacity: 0; transform: translate(-50%, -10px); }
+                100% { opacity: 0; transform: translate(-50%, -10px); }
+            }
+        `;
+        animationOverlay.appendChild(dynamicStyle);
         
         // Individual Phases
         mudra.math.forEach((concept, index) => {
@@ -240,38 +343,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const labelDiv = document.createElement('div');
             labelDiv.className = 'animation-label';
             labelDiv.textContent = concept.split(':')[0].trim();
-            labelDiv.style.animation = `labelFade ${totalDuration}s ${delay}s infinite`;
+            labelDiv.style.animation = `dynamicLabelFade ${totalDuration}s ${delay}s infinite`;
             animationOverlay.parentNode.appendChild(labelDiv);
 
             // Individual SVG Group
             const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            g.style.animation = `sequenceFadeFull ${totalDuration}s ${delay}s infinite`;
+            g.style.animation = `dynamicSequenceFade ${totalDuration}s ${delay}s infinite`;
             g.style.opacity = "0";
             svg.appendChild(g);
-            renderAnimationStep(g, concept.toLowerCase());
+            renderAnimationStep(g, concept.toLowerCase(), false, index);
         });
 
         // Combined Phase
         const combinedDelay = totalConcepts * durationPerStep;
         const combinedG = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        combinedG.style.animation = `sequenceFadeFull ${totalDuration}s ${combinedDelay}s infinite`;
+        combinedG.style.animation = `dynamicSequenceFade ${totalDuration}s ${combinedDelay}s infinite`;
         combinedG.style.opacity = "0";
         svg.appendChild(combinedG);
 
         const combinedLabel = document.createElement('div');
         combinedLabel.className = 'animation-label combined-label';
         combinedLabel.innerHTML = `<strong>Combined View:</strong><br>${mudra.math.map(m => m.split(':')[0].trim()).join(' & ')}`;
-        combinedLabel.style.animation = `labelFade ${totalDuration}s ${combinedDelay}s infinite`;
+        combinedLabel.style.animation = `dynamicLabelFade ${totalDuration}s ${combinedDelay}s infinite`;
         animationOverlay.parentNode.appendChild(combinedLabel);
 
-        mudra.math.forEach(concept => {
-            renderAnimationStep(combinedG, concept.toLowerCase(), true);
+        mudra.math.forEach((concept, index) => {
+            renderAnimationStep(combinedG, concept.toLowerCase(), true, index);
         });
     }
 
-    function renderAnimationStep(container, concept, isCombined = false) {
-        // Use different colors in combined view
-        const strokeColor = isCombined ? 'rgba(255, 215, 0, 0.8)' : 'rgba(255, 0, 0, 0.6)';
+    function renderAnimationStep(container, concept, isCombined = false, index = 0) {
+        // Distinct color palette for combined views
+        const combinedColors = ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00', '#FF8C00'];
+        const strokeColor = isCombined ? combinedColors[index % combinedColors.length] : 'rgba(255, 0, 0, 0.6)';
+        const strokeWidth = isCombined ? 4 : 3;
+        const shadowStyle = isCombined ? 'filter: drop-shadow(0 0 5px rgba(0,0,0,0.8));' : '';
 
         if (concept.includes('parallel')) {
             for (let i = 0; i < 4; i++) {
@@ -279,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     x1: 100 + (i * 40), y1: 50,
                     x2: 100 + (i * 40), y2: 350,
                     class: 'animated-line',
-                    style: isCombined ? `stroke: ${strokeColor}; stroke-width: 2;` : ''
+                    style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${shadowStyle}`
                 }));
             }
         } else if (concept.includes('angle') || concept.includes('perpendicular') || concept.includes('90')) {
@@ -287,31 +393,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 d: "M 150 100 L 150 300 L 300 300",
                 fill: 'none',
                 class: 'animated-line',
-                style: isCombined ? `stroke: cyan; stroke-width: 2;` : ''
+                style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${shadowStyle}`
             }));
         } else if (concept.includes('circle') || concept.includes('round') || concept.includes('cylinder') || concept.includes('radius')) {
             container.appendChild(createSVGElement('circle', {
                 cx: 200, cy: 200, r: 120,
                 class: 'animated-circle',
-                style: isCombined ? `stroke: magenta; stroke-width: 2;` : ''
+                style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${shadowStyle}`
             }));
         } else if (concept.includes('symmetry') || concept.includes('mirror') || concept.includes('reflection')) {
             container.appendChild(createSVGElement('line', {
                 x1: 200, y1: 50, x2: 200, y2: 350,
                 class: 'animated-line',
-                style: `stroke: ${isCombined ? 'lime' : 'var(--gold)'}; stroke-dasharray: 10, 5;`
+                style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; stroke-dasharray: 10, 5; ${shadowStyle}`
             }));
         } else if (concept.includes('point') || concept.includes('vertex')) {
             container.appendChild(createSVGElement('circle', {
-                cx: 200, cy: 200, r: 8,
-                class: 'animated-point'
+                cx: 200, cy: 200, r: 10,
+                class: 'animated-point',
+                style: `fill: ${strokeColor}; ${shadowStyle}`
             }));
         } else if (concept.includes('triangle') || concept.includes('v-shape') || concept.includes('intersect') || concept.includes('vertex')) {
             container.appendChild(createSVGElement('path', {
                 d: "M 100 150 L 200 300 L 300 150",
                 fill: 'none',
                 class: 'animated-line',
-                style: isCombined ? `stroke: orange; stroke-width: 2;` : ''
+                style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${shadowStyle}`
             }));
         } else {
             for (let i = 0; i < 8; i++) {
@@ -320,7 +427,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const y2 = 200 + Math.sin(angle) * 150;
                 container.appendChild(createSVGElement('line', {
                     x1: 200, y1: 200, x2: x2, y2: y2,
-                    class: 'animated-line'
+                    class: 'animated-line',
+                    style: `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${shadowStyle}`
                 }));
             }
         }
@@ -559,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="thank-you-content">
                             <h1 class="thank-you-text">THANK YOU</h1>
                             <div class="lotus-icon">🪷</div>
-                            <button class="btn" style="margin-top:40px; border:1px solid var(--gold);" onclick="document.getElementById('thankYouOverlay').style.display='none'">Return to Home</button>
+                            <button class="btn" style="margin-top:40px; border:1px solid var(--gold);" onclick="goBackHome()">Return to Home</button>
                         </div>
                     </div>
                 `;
@@ -580,4 +688,26 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+// Logout: clear auth and go to login page
+function doLogout() {
+    sessionStorage.removeItem('natyaAuth');
+    window.location.href = 'login.html';
+}
+
+// Return to main home page from Thank You overlay
+function goBackHome() {
+    const overlay = document.getElementById('thankYouOverlay');
+    if (overlay) overlay.style.display = 'none';
+    const contentPage = document.getElementById('contentPage');
+    const homePage = document.getElementById('homePage');
+    const homeBtn = document.getElementById('homeBtn');
+    const breadcrumbNav = document.getElementById('breadcrumbNav');
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (contentPage) contentPage.style.display = 'none';
+    if (homePage) homePage.style.display = 'flex';
+    if (homeBtn) homeBtn.style.display = 'none';
+    if (breadcrumbNav) breadcrumbNav.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'block';
+}
 
