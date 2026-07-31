@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Video Crossfade for smooth looping
     const bgVideo = document.getElementById('bgVideo');
-    if (bgVideo) {
+    if (bgVideo && bgVideo.tagName === 'VIDEO') {
         bgVideo.addEventListener('timeupdate', () => {
             const fadeDuration = 0.5; // seconds
             const timeLeft = bgVideo.duration - bgVideo.currentTime;
@@ -110,16 +110,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Section 7 Equation Listeners
-            const eqCards = contentArea.querySelectorAll('.equation-card');
-            eqCards.forEach(card => {
-                card.style.cursor = 'pointer';
-                card.addEventListener('click', () => {
-                    const title = card.querySelector('h3').textContent;
-                    const eq = dancingEquations.find(e => e.title === title);
-                    if (eq) openEquationModal(eq);
+            // Section 8 Subject Card Click Listeners (Animations)
+            if (target === 'fusion') {
+                console.log("Binding card click listeners for Section 8 fusion subjects...");
+                const statusText = document.getElementById('fusion-status-text');
+                if (statusText) {
+                    if (typeof window.openFusionModal === 'function') {
+                        statusText.textContent = "Click on each card to show interactive animation...";
+                        statusText.style.color = "var(--gold)";
+                        statusText.style.textShadow = "0 0 8px var(--gold)";
+                    } else {
+                        statusText.textContent = "Error: window.openFusionModal not found!";
+                        statusText.style.color = "#ff4d4d";
+                        statusText.style.textShadow = "0 0 8px #ff4d4d";
+                    }
+                }
+                const subjectCards = contentArea.querySelectorAll('.subject-card');
+                console.log(`Found ${subjectCards.length} cards.`);
+                subjectCards.forEach(card => {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => {
+                        let name = card.dataset.subject;
+                        if (!name) {
+                            const h3 = card.querySelector('h3');
+                            if (h3) name = h3.textContent.trim();
+                        }
+                        console.log(`Clicked on subject card: ${name}`);
+                        if (!name) {
+                            console.error("Could not find subject name!");
+                            return;
+                        }
+                        const subData = fusionSubjects.find(s => s.name.toLowerCase() === name.toLowerCase());
+                        if (subData) {
+                            console.log("Subject data found:", subData);
+                            if (typeof window.openFusionModal === 'function') {
+                                console.log("Calling window.openFusionModal...");
+                                window.openFusionModal(subData);
+                            } else {
+                                console.error("window.openFusionModal is not defined in window scope!");
+                                alert("Error: Animation module not fully loaded. Check browser console.");
+                            }
+                        } else {
+                            console.error(`Could not find subject data for name: ${name}`);
+                        }
+                    });
                 });
-            });
+            }
 
             // Bind Next/Prev button events
             const prevBtn = document.getElementById('prevSectionBtn');
@@ -633,9 +669,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 return `
                     <h2 class="section-title">8. The Fusion of Subjects and Traditions</h2>
+                    <div id="fusion-status-indicator" style="text-align:center; margin:-20px auto 30px; font-family:'Cinzel', serif; font-size:0.95rem; color:var(--cream); letter-spacing:1px; background:rgba(128,0,0,0.15); padding:12px; border:1px dashed var(--glass-border); border-radius:30px; max-width:600px;">
+                        <span id="fusion-status-text" style="color:#ff4d4d; font-weight:bold; text-shadow:0 0 5px rgba(255,0,0,0.5);">Connecting modules...</span>
+                    </div>
                     <div class="subject-fusion">
                         ${fusionSubjects.map(sub => `
-                            <div class="subject-card">
+                            <div class="subject-card" data-subject="${sub.name}">
                                 <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
                                     <div class="subject-icon-circle">${subjectIcons[sub.name] || '🎨'}</div>
                                     <h3 style="margin:0;">${sub.name}</h3>

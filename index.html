@@ -6,10 +6,20 @@
         if (!sessionStorage.getItem('natyaAuth')) {
             window.location.replace('login.html');
         }
+        window.addEventListener('error', function(e) {
+            var banner = document.getElementById('debug-error-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'debug-error-banner';
+                banner.style = 'position:fixed; bottom:20px; left:20px; background:rgba(180,0,0,0.95); color:white; padding:18px; border:2px solid #ff4d4d; border-radius:10px; z-index:99999; font-family:monospace; font-size:12px; max-width:80vw; box-shadow:0 0 20px rgba(0,0,0,0.5);';
+                document.body.appendChild(banner);
+            }
+            banner.innerHTML += '<div>❌ <strong>Error:</strong> ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
+        });
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuchipudi: The Art of Mathematical Expressions</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=25">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -31,18 +41,9 @@
         </div>
 
         <div class="home-body">
-            <!-- Left Column: Dancer VIDEO (replaces the static image) -->
+            <!-- Left Column: Infographic Image (replaces the video) -->
             <div class="home-left">
-                <div class="sparkle" style="top: 28%; left: 47.5%;"></div>
-                <div class="sparkle" style="top: 28%; left: 52.5%;"></div>
-
-                <video id="bgVideo" class="dancer-video" autoplay loop muted playsinline>
-                    <source src="images/shorts_video.mp4" type="video/mp4">
-                    <img src="images/kuchipudi_dancer_classical.png" alt="Classical Kuchipudi Dancer" class="dancer-video">
-                </video>
-
-                <div class="particles"></div>
-                <div class="stage-lighting"></div>
+                <img id="bgVideo" class="dancer-video" src="images/natyaganitha_hero.jpg" alt="NatyaGanitha Infographic">
             </div>
 
             <!-- Right Column: Navigation -->
@@ -94,7 +95,33 @@
         </div>
     </div>
 
+
+    <!-- Subject Fusion Animation Modal -->
+    <div id="fusionModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content fusion-modal-content">
+            <button id="closeFusionModal" class="close-btn">&times;</button>
+            <div class="modal-body">
+                <div class="fusion-visual-container">
+                    <img id="fusionBgImage" alt="Subject Diagram" />
+                    <canvas id="fusionCanvas"></canvas>
+                    <div id="fusionSvgOverlay" class="fusion-svg-overlay-container"></div>
+                </div>
+                <div class="modal-info-panel fusion-info-panel">
+                    <div class="subject-header-wrap">
+                        <div id="fusionSubjectIcon" class="subject-icon-circle"></div>
+                        <h2 id="fusionSubjectName">Subject Name</h2>
+                    </div>
+                    <div id="fusionSubjectDesc" class="subject-desc-section">
+                        <!-- Content here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="js/data.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=25"></script>
+    <script src="js/fusionAnim.js?v=25"></script>
 </body>
 </html>
