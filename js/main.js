@@ -102,6 +102,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (mudra) openMudraModal(mudra);
                     });
                 });
+            } else if (target === 'equations') {
+                // Attach equation card listeners for Section 7: The Dancing Equations
+                const eqCards = contentArea.querySelectorAll('.equation-card');
+                console.log(`[Dancing Equations] Found ${eqCards.length} equation cards to bind.`);
+                eqCards.forEach((card, index) => {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => {
+                        const titleEl = card.querySelector('h3');
+                        if (!titleEl) {
+                            console.error(`[Dancing Equations] Card at index ${index} lacks an h3 element.`);
+                            return;
+                        }
+                        const title = titleEl.textContent.trim();
+                        console.log(`[Dancing Equations] Card clicked: "${title}"`);
+                        const eq = dancingEquations.find(e => e.title.toLowerCase() === title.toLowerCase());
+                        if (eq) {
+                            console.log(`[Dancing Equations] Matching metadata found. Opening modal...`);
+                            openEquationModal(eq);
+                        } else {
+                            console.error(`[Dancing Equations] No matching metadata found for title: "${title}"`);
+                        }
+                    });
+                });
             } else {
                 // For non-math sections, make cards non-clickable
                 const mudraCards = contentArea.querySelectorAll('.mudra-card');
@@ -195,7 +218,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingLabels = animationOverlay.parentNode.querySelectorAll('.animation-label');
         existingLabels.forEach(l => l.remove());
 
-        modalMudraImg.src = "https://placehold.co/600x400/800000/FFD700?text=" + encodeURIComponent(eq.title);
+        // Hide mudra image and set a dark background for contrast
+        modalMudraImg.style.display = 'none';
+        modalMudraImg.src = '';
+        const visualContainer = modalMudraImg.parentElement;
+        if (visualContainer) {
+            visualContainer.style.background = '#0e0202'; // Very dark, premium theme-appropriate background
+        }
+
         modalMudraName.textContent = eq.title;
         modalMudraPlacement.textContent = eq.equation;
         
@@ -220,91 +250,488 @@ document.addEventListener('DOMContentLoaded', () => {
         animationOverlay.appendChild(svg);
 
         const title = eq.title.toLowerCase();
-        console.log("Creating animation for:", title); // Helper for debugging if needed
+        console.log("Creating creative animation for:", title);
 
-        // Use more specific matching to avoid overlaps
-        if (title === 'linear functions') {
-            svg.appendChild(createSVGElement('line', { x1: 50, y1: 350, x2: 350, y2: 50, class: 'animated-line', style: 'stroke:var(--gold); stroke-width:5;' }));
-        } else if (title === 'circle') {
-            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 120, class: 'animated-circle', style: 'stroke:var(--gold); stroke-width:5;' }));
-        } else if (title === 'sine waves') {
-            let d = "M 50 200";
-            for (let x = 50; x <= 350; x += 10) {
-                const y = 200 + Math.sin((x - 50) / 30) * 80;
-                d += ` L ${x} ${y}`;
+        // Inject dynamic keyframe animation helper
+        const dynamicStyle = document.createElement('style');
+        dynamicStyle.innerHTML = `
+            @keyframes pulseSymmetry {
+                0% { transform: scale(0.98); opacity: 0.8; }
+                100% { transform: scale(1.02); opacity: 1; }
             }
-            svg.appendChild(createSVGElement('path', { d, fill: 'none', class: 'animated-line', style: 'stroke:var(--gold); stroke-width:5;' }));
+        `;
+        animationOverlay.appendChild(dynamicStyle);
+
+        if (title === 'linear functions') {
+            // Draw baseline coordinates
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 200, x2: 350, y2: 200, stroke: 'rgba(255,215,0,0.2)', 'stroke-width': 2, 'stroke-dasharray': '5,5' }));
+            
+            // Linear horizontal track (Eye gaze trajectory)
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 200, x2: 350, y2: 200, class: 'animated-line', style: 'stroke:var(--gold); stroke-width:4;' }));
+            
+            // Gliding pointer (The pupil/focus point tracking horizontally)
+            const eyePointer = createSVGElement('circle', { cx: 50, cy: 200, r: 10, fill: 'red', filter: 'drop-shadow(0 0 8px red)' });
+            const eyeAnim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            eyeAnim.setAttribute("attributeName", "cx");
+            eyeAnim.setAttribute("values", "50;350;50");
+            eyeAnim.setAttribute("dur", "4s");
+            eyeAnim.setAttribute("repeatCount", "indefinite");
+            eyePointer.appendChild(eyeAnim);
+            svg.appendChild(eyePointer);
+
+            // Adding secondary vertical tracking line to form coordinate projection
+            const projectionLine = createSVGElement('line', { x1: 50, y1: 50, x2: 50, y2: 350, stroke: 'rgba(255,215,0,0.1)', 'stroke-width': 1 });
+            const projAnim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            projAnim.setAttribute("attributeName", "x1");
+            projAnim.setAttribute("values", "50;350;50");
+            projAnim.setAttribute("dur", "4s");
+            projAnim.setAttribute("repeatCount", "indefinite");
+            const projAnimX2 = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            projAnimX2.setAttribute("attributeName", "x2");
+            projAnimX2.setAttribute("values", "50;350;50");
+            projAnimX2.setAttribute("dur", "4s");
+            projAnimX2.setAttribute("repeatCount", "indefinite");
+            projectionLine.appendChild(projAnim);
+            projectionLine.appendChild(projAnimX2);
+            svg.appendChild(projectionLine);
+
+        } else if (title === 'circle') {
+            // Origin Center point
+            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 6, fill: 'red' }));
+            
+            // Dotted reference perimeter
+            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 110, fill: 'none', stroke: 'rgba(255,215,0,0.2)', 'stroke-width': 2, 'stroke-dasharray': '5,5' }));
+            
+            // Animated circle path
+            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 110, class: 'animated-circle', style: 'stroke:var(--gold); stroke-width:4;' }));
+            
+            // Rotating vector arm and trace marker
+            const circleGroup = createSVGElement('g', { transform: 'translate(200, 200)' });
+            const radiusLine = createSVGElement('line', { x1: 0, y1: 0, x2: 110, y2: 0, stroke: 'var(--gold)', 'stroke-width': 2 });
+            const traceDot = createSVGElement('circle', { cx: 110, cy: 0, r: 8, fill: 'red', filter: 'drop-shadow(0 0 5px red)' });
+            
+            const rotateAnim = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
+            rotateAnim.setAttribute("attributeName", "transform");
+            rotateAnim.setAttribute("type", "rotate");
+            rotateAnim.setAttribute("from", "0 0 0");
+            rotateAnim.setAttribute("to", "360 0 0");
+            rotateAnim.setAttribute("dur", "4s");
+            rotateAnim.setAttribute("repeatCount", "indefinite");
+            
+            circleGroup.appendChild(rotateAnim);
+            circleGroup.appendChild(radiusLine);
+            circleGroup.appendChild(traceDot);
+            svg.appendChild(circleGroup);
+
+        } else if (title === 'sine waves') {
+            // Wave trace coordinates
+            let d = "M 50 200";
+            let valuesX = [];
+            let valuesY = [];
+            for (let x = 50; x <= 350; x += 6) {
+                const y = 200 + Math.sin((x - 50) / 25) * 80;
+                d += ` L ${x} ${y}`;
+                valuesX.push(x);
+                valuesY.push(y);
+            }
+            // Draw axis
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 200, x2: 350, y2: 200, stroke: 'rgba(255,215,0,0.15)', 'stroke-width': 2 }));
+            
+            // Animated wave path
+            svg.appendChild(createSVGElement('path', { d, fill: 'none', class: 'animated-line', style: 'stroke:var(--gold); stroke-width:4;' }));
+            
+            // Tracer dot representing head oscillation (Attami) gliding along the wave path
+            const tracer = createSVGElement('circle', { cx: 50, cy: 200, r: 8, fill: 'red', filter: 'drop-shadow(0 0 6px red)' });
+            const tracerAnimX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            tracerAnimX.setAttribute("attributeName", "cx");
+            tracerAnimX.setAttribute("values", valuesX.join(';'));
+            tracerAnimX.setAttribute("dur", "4s");
+            tracerAnimX.setAttribute("repeatCount", "indefinite");
+            
+            const tracerAnimY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            tracerAnimY.setAttribute("attributeName", "cy");
+            tracerAnimY.setAttribute("values", valuesY.join(';'));
+            tracerAnimY.setAttribute("dur", "4s");
+            tracerAnimY.setAttribute("repeatCount", "indefinite");
+            
+            tracer.appendChild(tracerAnimX);
+            tracer.appendChild(tracerAnimY);
+            svg.appendChild(tracer);
+
         } else if (title === 'parabolic motion') {
-            let d = "M 50 350 Q 200 0 350 350";
-            svg.appendChild(createSVGElement('path', { d, fill: 'none', class: 'animated-line', style: 'stroke:var(--gold); stroke-width:5;' }));
+            // Draw ground level
+            svg.appendChild(createSVGElement('line', { x1: 30, y1: 320, x2: 370, y2: 320, stroke: 'rgba(255,215,0,0.3)', 'stroke-width': 3 }));
+            
+            // Parabolic path (dancer's jump trajectory)
+            let d = "M 50 320 Q 200 60 350 320";
+            svg.appendChild(createSVGElement('path', { d, fill: 'none', class: 'animated-line', style: 'stroke:var(--gold); stroke-width:4;' }));
+            
+            // Generate parabolic leap points using quadratic Bezier curve formulas
+            let leapX = [];
+            let leapY = [];
+            for (let t = 0; t <= 1.001; t += 0.04) {
+                const cx = (1-t)*(1-t)*50 + 2*(1-t)*t*200 + t*t*350;
+                const cy = (1-t)*(1-t)*320 + 2*(1-t)*t*60 + t*t*320;
+                leapX.push(cx);
+                leapY.push(cy);
+            }
+
+            // Pulsing tracer dot representing the dancer jumping
+            const jumper = createSVGElement('circle', { cx: 50, cy: 320, r: 10, fill: 'red', filter: 'drop-shadow(0 0 6px red)' });
+            const jumperX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            jumperX.setAttribute("attributeName", "cx");
+            jumperX.setAttribute("values", leapX.join(';'));
+            jumperX.setAttribute("dur", "3s");
+            jumperX.setAttribute("repeatCount", "indefinite");
+            
+            const jumperY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            jumperY.setAttribute("attributeName", "cy");
+            jumperY.setAttribute("values", leapY.join(';'));
+            jumperY.setAttribute("dur", "3s");
+            jumperY.setAttribute("repeatCount", "indefinite");
+            
+            jumper.appendChild(jumperX);
+            jumper.appendChild(jumperY);
+            svg.appendChild(jumper);
+
         } else if (title === 'reflection symmetry') {
-            svg.appendChild(createSVGElement('line', { x1: 200, y1: 50, x2: 200, y2: 350, stroke: 'var(--gold)', 'stroke-width': 2, 'stroke-dasharray': '10,5' }));
-            svg.appendChild(createSVGElement('path', { d: "M 100 150 L 100 250 L 180 200 Z", fill: 'var(--gold)', opacity: '0.7', class: 'animated-line' }));
-            svg.appendChild(createSVGElement('path', { d: "M 300 150 L 300 250 L 220 200 Z", fill: 'var(--gold)', opacity: '0.7', class: 'animated-line' }));
+            // Central mirror line
+            svg.appendChild(createSVGElement('line', { x1: 200, y1: 40, x2: 200, y2: 360, stroke: 'red', 'stroke-width': 2, 'stroke-dasharray': '6,4', class: 'animated-line' }));
+            
+            // Left mirror side (Symmetric small triangle)
+            const leftSide = createSVGElement('g');
+            leftSide.appendChild(createSVGElement('polygon', { points: "150,200 180,180 180,220", fill: 'rgba(255,215,0,0.15)', stroke: 'var(--gold)', 'stroke-width': 3 }));
+            leftSide.style.transformOrigin = "170px 200px";
+            leftSide.style.animation = "pulseSymmetry 2.5s infinite alternate ease-in-out";
+            svg.appendChild(leftSide);
+            
+            // Right mirror side (Perfect mirror of the left across x=200 axis)
+            const rightSide = createSVGElement('g');
+            rightSide.appendChild(createSVGElement('polygon', { points: "250,200 220,180 220,220", fill: 'rgba(255,215,0,0.15)', stroke: 'var(--gold)', 'stroke-width': 3 }));
+            rightSide.style.transformOrigin = "230px 200px";
+            rightSide.style.animation = "pulseSymmetry 2.5s infinite alternate ease-in-out";
+            svg.appendChild(rightSide);
+
         } else if (title === 'angular rotation') {
-            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 100, fill: 'none', stroke: 'var(--gold)', 'stroke-width': 2, 'stroke-dasharray': '5,5' }));
-            const g = createSVGElement('g', { transform: 'translate(200, 200)' });
-            const line = createSVGElement('line', { x1: 0, y1: 0, x2: 100, y2: 0, stroke: 'var(--gold)', 'stroke-width': 5 });
-            const dot = createSVGElement('circle', { cx: 100, cy: 0, r: 12, fill: 'red' });
-            const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
-            anim.setAttribute("attributeName", "transform");
-            anim.setAttribute("type", "rotate");
-            anim.setAttribute("from", "0 0 0");
-            anim.setAttribute("to", "360 0 0");
-            anim.setAttribute("dur", "3s");
-            anim.setAttribute("repeatCount", "indefinite");
-            g.appendChild(anim);
-            g.appendChild(line);
-            g.appendChild(dot);
-            svg.appendChild(g);
+            // Center spin origin (Dancer's rotation axis)
+            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 8, fill: 'var(--gold)' }));
+
+            // Pre-calculate variables demonstrating conservation of angular momentum:
+            // 1. Slow outer rotation: Radius = 110
+            // 2. Arms pull in: Radius drops to 40, spin speed increases by 3x!
+            // 3. Arms push back out: Radius goes to 110, spin speed decreases.
+            let spinX = [];
+            let spinY = [];
+            let rTrace = [];
+            const steps = 150;
+            
+            for (let i = 0; i <= steps; i++) {
+                const pct = i / steps;
+                let currentR = 110;
+                let currentAngle = 0;
+                
+                if (pct < 0.33) {
+                    // Slow rotation at outer radius (110)
+                    currentR = 110;
+                    currentAngle = pct * 3 * Math.PI * 2;
+                } else if (pct < 0.66) {
+                    // Arms pull in (110 -> 40), rotational velocity increases
+                    const localPct = (pct - 0.33) * 3;
+                    currentR = 110 - localPct * 70;
+                    currentAngle = 3 * Math.PI * 2 + localPct * 6 * Math.PI * 2; // Extra speed!
+                } else {
+                    // Arms push back out (40 -> 110), spin slows down
+                    const localPct = (pct - 0.66) * 3;
+                    currentR = 40 + localPct * 70;
+                    currentAngle = 9 * Math.PI * 2 + localPct * 3 * Math.PI * 2;
+                }
+                
+                const cx = 200 + Math.cos(currentAngle) * currentR;
+                const cy = 200 + Math.sin(currentAngle) * currentR;
+                spinX.push(cx);
+                spinY.push(cy);
+                rTrace.push(currentR);
+            }
+
+            // Radial dashed boundary circle representing boundary contraction/expansion
+            const dashBoundary = createSVGElement('circle', { cx: 200, cy: 200, r: 110, fill: 'none', stroke: 'rgba(255,215,0,0.15)', 'stroke-width': 2, 'stroke-dasharray': '5,5' });
+            const rAnim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            rAnim.setAttribute("attributeName", "r");
+            rAnim.setAttribute("values", rTrace.join(';'));
+            rAnim.setAttribute("dur", "6s");
+            rAnim.setAttribute("repeatCount", "indefinite");
+            dashBoundary.appendChild(rAnim);
+            svg.appendChild(dashBoundary);
+
+            // Dancer's hands/tracer point
+            const spinDot = createSVGElement('circle', { cx: 310, cy: 200, r: 10, fill: 'red', filter: 'drop-shadow(0 0 6px red)' });
+            const spinAnimX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            spinAnimX.setAttribute("attributeName", "cx");
+            spinAnimX.setAttribute("values", spinX.join(';'));
+            spinAnimX.setAttribute("dur", "6s");
+            spinAnimX.setAttribute("repeatCount", "indefinite");
+            const spinAnimY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            spinAnimY.setAttribute("attributeName", "cy");
+            spinAnimY.setAttribute("values", spinY.join(';'));
+            spinAnimY.setAttribute("dur", "6s");
+            spinAnimY.setAttribute("repeatCount", "indefinite");
+            
+            spinDot.appendChild(spinAnimX);
+            spinDot.appendChild(spinAnimY);
+            svg.appendChild(spinDot);
+
         } else if (title === 'arithmetic sequences') {
+            // Sequence grid axis
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 220, x2: 350, y2: 220, stroke: 'rgba(255,215,0,0.2)', 'stroke-width': 2 }));
+            
+            // Draw sequential beat nodes
             for (let i = 0; i < 5; i++) {
                 const x = 70 + i * 65;
-                const c = createSVGElement('circle', { cx: x, cy: 200, r: 20, fill: 'var(--gold)', opacity: 0.8 });
-                c.style.animation = `pulsePoint 1s infinite alternate ${i * 0.2}s`;
-                svg.appendChild(c);
-                const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                t.setAttribute("x", x); t.setAttribute("y", 205); t.setAttribute("text-anchor", "middle");
-                t.setAttribute("fill", "black"); t.setAttribute("font-weight", "bold"); t.textContent = (i + 1);
-                svg.appendChild(t);
+                
+                // Draw target node
+                svg.appendChild(createSVGElement('circle', { cx: x, cy: 220, r: 16, fill: 'none', stroke: 'var(--gold)', 'stroke-width': 2, class: 'animated-circle' }));
+                
+                // Node indices (a_1, a_2...)
+                const indexText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                indexText.setAttribute("x", x); indexText.setAttribute("y", 265);
+                indexText.setAttribute("fill", "var(--gold)"); indexText.setAttribute("font-size", "14");
+                indexText.setAttribute("text-anchor", "middle");
+                indexText.textContent = `a_${i+1}`;
+                svg.appendChild(indexText);
+                
+                // Add calculation difference text (+d) between nodes
+                if (i > 0) {
+                    const diffText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    diffText.setAttribute("x", x - 32.5); diffText.setAttribute("y", 195);
+                    diffText.setAttribute("fill", "red"); diffText.setAttribute("font-size", "14");
+                    diffText.setAttribute("text-anchor", "middle");
+                    diffText.textContent = "+d";
+                    svg.appendChild(diffText);
+                }
             }
+
+            // Stepping foot (Rhythmic sequence stepper jumping from beat to beat)
+            const stepper = createSVGElement('circle', { cx: 70, cy: 220, r: 10, fill: 'red', filter: 'drop-shadow(0 0 6px red)' });
+            const stepperX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            stepperX.setAttribute("attributeName", "cx");
+            stepperX.setAttribute("values", "70;135;200;265;330;70");
+            stepperX.setAttribute("keyTimes", "0;0.2;0.4;0.6;0.8;1");
+            stepperX.setAttribute("dur", "5s");
+            stepperX.setAttribute("repeatCount", "indefinite");
+            
+            const stepperY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            stepperY.setAttribute("attributeName", "cy");
+            stepperY.setAttribute("values", "220;170;220;170;220;170;220;170;220;170;220");
+            stepperY.setAttribute("keyTimes", "0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;1");
+            stepperY.setAttribute("dur", "5s");
+            stepperY.setAttribute("repeatCount", "indefinite");
+            
+            stepper.appendChild(stepperX);
+            stepper.appendChild(stepperY);
+            svg.appendChild(stepper);
+
         } else if (title === 'coordinate geometry') {
-            svg.appendChild(createSVGElement('line', { x1: 50, y1: 200, x2: 350, y2: 200, stroke: 'var(--gold)', 'stroke-width': 3 }));
-            svg.appendChild(createSVGElement('line', { x1: 200, y1: 50, x2: 200, y2: 350, stroke: 'var(--gold)', 'stroke-width': 3 }));
-            const dot = createSVGElement('circle', { cx: 280, cy: 120, r: 12, fill: 'red' });
-            svg.appendChild(dot);
-            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            t.setAttribute("x", 295); t.setAttribute("y", 110); t.setAttribute("fill", "var(--gold)"); t.setAttribute("font-size", "20"); t.textContent = "(x, y)";
-            svg.appendChild(t);
+            // Draw XY Cartesian Grid
+            for (let i = 1; i < 8; i++) {
+                svg.appendChild(createSVGElement('line', { x1: i * 50, y1: 0, x2: i * 50, y2: 400, stroke: 'rgba(255,215,0,0.05)', 'stroke-width': 1 }));
+                svg.appendChild(createSVGElement('line', { x1: 0, y1: i * 50, x2: 400, y2: i * 50, stroke: 'rgba(255,215,0,0.05)', 'stroke-width': 1 }));
+            }
+            // Draw main axes
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 340, x2: 350, y2: 340, stroke: 'rgba(255,215,0,0.3)', 'stroke-width': 2, class: 'animated-line' }));
+            svg.appendChild(createSVGElement('line', { x1: 50, y1: 40, x2: 50, y2: 340, stroke: 'rgba(255,215,0,0.3)', 'stroke-width': 2, class: 'animated-line' }));
+            
+            const originTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            originTxt.setAttribute("x", "30"); originTxt.setAttribute("y", "360");
+            originTxt.setAttribute("fill", "var(--gold)"); originTxt.setAttribute("font-size", "12");
+            originTxt.textContent = "(0,0)";
+            svg.appendChild(originTxt);
+
+            // Create 3 coordinate points (Dancers in stage formation)
+            // Moving from origin (50,340) to their respective coordinates:
+            // Point 1: (110, 270)
+            // Point 2: (290, 270)
+            // Point 3: (200, 110)
+            const dot1 = createSVGElement('circle', { cx: 50, cy: 340, r: 8, fill: 'red', filter: 'drop-shadow(0 0 4px red)' });
+            const dot1x = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot1x.setAttribute("attributeName", "cx"); dot1x.setAttribute("values", "50;110;110;50"); dot1x.setAttribute("dur", "6s"); dot1x.setAttribute("repeatCount", "indefinite");
+            const dot1y = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot1y.setAttribute("attributeName", "cy"); dot1y.setAttribute("values", "340;270;270;340"); dot1y.setAttribute("dur", "6s"); dot1y.setAttribute("repeatCount", "indefinite");
+            dot1.appendChild(dot1x); dot1.appendChild(dot1y);
+
+            const dot2 = createSVGElement('circle', { cx: 50, cy: 340, r: 8, fill: 'cyan', filter: 'drop-shadow(0 0 4px cyan)' });
+            const dot2x = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot2x.setAttribute("attributeName", "cx"); dot2x.setAttribute("values", "50;290;290;50"); dot2x.setAttribute("dur", "6s"); dot2x.setAttribute("repeatCount", "indefinite");
+            const dot2y = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot2y.setAttribute("attributeName", "cy"); dot2y.setAttribute("values", "340;270;270;340"); dot2y.setAttribute("dur", "6s"); dot2y.setAttribute("repeatCount", "indefinite");
+            dot2.appendChild(dot2x); dot2.appendChild(dot2y);
+
+            const dot3 = createSVGElement('circle', { cx: 50, cy: 340, r: 8, fill: 'magenta', filter: 'drop-shadow(0 0 4px magenta)' });
+            const dot3x = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot3x.setAttribute("attributeName", "cx"); dot3x.setAttribute("values", "50;200;200;50"); dot3x.setAttribute("dur", "6s"); dot3x.setAttribute("repeatCount", "indefinite");
+            const dot3y = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            dot3y.setAttribute("attributeName", "cy"); dot3y.setAttribute("values", "340;110;110;340"); dot3y.setAttribute("dur", "6s"); dot3y.setAttribute("repeatCount", "indefinite");
+            dot3.appendChild(dot3x); dot3.appendChild(dot3y);
+
+            // Stage boundary polygon forming a triangle
+            const triangle = createSVGElement('polygon', { points: "110,270 290,270 200,110", fill: 'rgba(255,215,0,0.15)', stroke: 'var(--gold)', 'stroke-width': 2 });
+            const triOpacity = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            triOpacity.setAttribute("attributeName", "opacity");
+            triOpacity.setAttribute("values", "0;0;1;1;0;0");
+            triOpacity.setAttribute("keyTimes", "0;0.35;0.45;0.8;0.9;1");
+            triOpacity.setAttribute("dur", "6s");
+            triOpacity.setAttribute("repeatCount", "indefinite");
+            triangle.appendChild(triOpacity);
+
+            svg.appendChild(triangle);
+            svg.appendChild(dot1);
+            svg.appendChild(dot2);
+            svg.appendChild(dot3);
+
         } else if (title === 'modular arithmetic') {
-            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 120, fill: 'none', stroke: 'var(--gold)', 'stroke-width': 3 }));
+            // Circular Timeline representing modulo n repeating cycle
+            svg.appendChild(createSVGElement('circle', { cx: 200, cy: 220, r: 100, fill: 'none', stroke: 'rgba(255,215,0,0.2)', 'stroke-width': 2, class: 'animated-circle' }));
+            
+            // Loop coordinate configurations
+            let mathTexts = [];
+            for (let i = 0; i < 16; i++) {
+                const currentBeat = i + 1;
+                const modResult = currentBeat % 8 === 0 ? 0 : currentBeat % 8;
+                mathTexts.push(`Beat ${currentBeat} ≡ ${modResult} (mod 8)`);
+            }
+
+            // Calculation status box
+            const displayMath = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            displayMath.setAttribute("x", "200"); displayMath.setAttribute("y", "70");
+            displayMath.setAttribute("fill", "var(--gold)"); displayMath.setAttribute("font-size", "22");
+            displayMath.setAttribute("text-anchor", "middle"); displayMath.setAttribute("font-weight", "bold");
+            
+            const textAnim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            textAnim.setAttribute("attributeName", "textContent");
+            textAnim.setAttribute("values", mathTexts.join(';'));
+            textAnim.setAttribute("dur", "12s");
+            textAnim.setAttribute("repeatCount", "indefinite");
+            displayMath.appendChild(textAnim);
+            svg.appendChild(displayMath);
+
+            // Draw beat nodes around the modular clock
+            const moduloX = [];
+            const moduloY = [];
             for (let i = 0; i < 8; i++) {
                 const angle = (i / 8) * Math.PI * 2 - Math.PI/2;
-                const x = 200 + Math.cos(angle) * 120;
-                const y = 200 + Math.sin(angle) * 120;
-                svg.appendChild(createSVGElement('circle', { cx: x, cy: y, r: 8, fill: 'red' }));
-                const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                t.setAttribute("x", 200 + Math.cos(angle) * 150); t.setAttribute("y", 200 + Math.sin(angle) * 150);
-                t.setAttribute("text-anchor", "middle"); t.setAttribute("fill", "var(--gold)"); t.setAttribute("font-size", "18"); t.textContent = i;
-                svg.appendChild(t);
+                const cx = 200 + Math.cos(angle) * 100;
+                const cy = 220 + Math.sin(angle) * 100;
+                moduloX.push(cx);
+                moduloY.push(cy);
+
+                // Small node anchor
+                svg.appendChild(createSVGElement('circle', { cx, cy, r: 6, fill: 'var(--gold)' }));
+
+                // Node indices (0 to 7)
+                const nodeVal = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                nodeVal.setAttribute("x", 200 + Math.cos(angle) * 125);
+                nodeVal.setAttribute("y", 220 + Math.sin(angle) * 125 + 5);
+                nodeVal.setAttribute("fill", "rgba(255,215,0,0.6)");
+                nodeVal.setAttribute("font-size", "14");
+                nodeVal.setAttribute("text-anchor", "middle");
+                nodeVal.textContent = i;
+                svg.appendChild(nodeVal);
             }
+
+            // Generate ticking tracking points (16 total steps)
+            const tickXArr = [];
+            const tickYArr = [];
+            for (let i = 0; i < 16; i++) {
+                const idx = i % 8;
+                tickXArr.push(moduloX[idx]);
+                tickYArr.push(moduloY[idx]);
+            }
+            tickXArr.push(tickXArr[0]);
+            tickYArr.push(tickYArr[0]);
+
+            // Modular pointer ticking beat by beat discrete
+            const tickIndicator = createSVGElement('circle', { cx: 200, cy: 120, r: 12, fill: 'red', filter: 'drop-shadow(0 0 6px red)' });
+            const clockTickX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            clockTickX.setAttribute("attributeName", "cx"); clockTickX.setAttribute("values", tickXArr.join(';'));
+            clockTickX.setAttribute("dur", "12s"); clockTickX.setAttribute("repeatCount", "indefinite"); clockTickX.setAttribute("calcMode", "discrete");
+            const clockTickY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            clockTickY.setAttribute("attributeName", "cy"); clockTickY.setAttribute("values", tickYArr.join(';'));
+            clockTickY.setAttribute("dur", "12s"); clockTickY.setAttribute("repeatCount", "indefinite"); clockTickY.setAttribute("calcMode", "discrete");
+            
+            tickIndicator.appendChild(clockTickX);
+            tickIndicator.appendChild(clockTickY);
+            svg.appendChild(tickIndicator);
+
         } else if (title === 'wave functions') {
-            for (let i = 0; i < 2; i++) {
-                let d = "M 50 200";
-                for (let x = 50; x <= 350; x += 5) {
-                    const y = 200 + Math.sin((x + i*100) / 20) * 60;
-                    d += ` L ${x} ${y}`;
-                }
-                const p = createSVGElement('path', { d, fill: 'none', stroke: i === 0 ? 'cyan' : 'magenta', 'stroke-width': 4, opacity: 0.7, class: 'animated-line' });
-                svg.appendChild(p);
+            // Wave 1: Translating Left (Cyan)
+            const w1G = createSVGElement('g');
+            let d1 = "M -100 200";
+            for (let x = -100; x <= 500; x += 10) {
+                const y = 200 + Math.sin(x / 30) * 40;
+                d1 += ` L ${x} ${y}`;
             }
+            const wave1 = createSVGElement('path', { d: d1, fill: 'none', stroke: 'cyan', 'stroke-width': 2, opacity: 0.5 });
+            const animW1 = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
+            animW1.setAttribute("attributeName", "transform"); animW1.setAttribute("type", "translate");
+            animW1.setAttribute("from", "0 0"); animW1.setAttribute("to", "188.4 0"); // Sine cycle period
+            animW1.setAttribute("dur", "4s"); animW1.setAttribute("repeatCount", "indefinite");
+            w1G.appendChild(wave1);
+            w1G.appendChild(animW1);
+            svg.appendChild(w1G);
+
+            // Wave 2: Translating Right (Magenta)
+            const w2G = createSVGElement('g');
+            let d2 = "M -100 200";
+            for (let x = -100; x <= 500; x += 10) {
+                const y = 200 + Math.sin(x / 30) * 40;
+                d2 += ` L ${x} ${y}`;
+            }
+            const wave2 = createSVGElement('path', { d: d2, fill: 'none', stroke: 'magenta', 'stroke-width': 2, opacity: 0.5 });
+            const animW2 = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
+            animW2.setAttribute("attributeName", "transform"); animW2.setAttribute("type", "translate");
+            animW2.setAttribute("from", "0 0"); animW2.setAttribute("to", "-188.4 0");
+            animW2.setAttribute("dur", "4s"); animW2.setAttribute("repeatCount", "indefinite");
+            w2G.appendChild(wave2);
+            w2G.appendChild(animW2);
+            svg.appendChild(w2G);
+
+            // Wave 3: Morphing Combined Wave (Gold) demonstrating constructive & destructive interference
+            // Phase morph targets: constructive -> destructive (flat) -> constructive (inv) -> destructive -> constructive
+            let dComb0 = "M 50 200";
+            let dComb1 = "M 50 200";
+            let dComb2 = "M 50 200";
+            let dComb3 = "M 50 200";
+            
+            for (let x = 50; x <= 350; x += 10) {
+                const ang = (x - 50) / 30;
+                dComb0 += ` L ${x} ${200 + Math.sin(ang) * 80}`; // Constructive Peak
+                dComb1 += ` L ${x} 200`;                           // Flat Destructive
+                dComb2 += ` L ${x} ${200 - Math.sin(ang) * 80}`; // Constructive Trough
+                dComb3 += ` L ${x} 200`;                           // Flat Destructive
+            }
+            
+            const combWave = createSVGElement('path', { d: dComb0, fill: 'none', stroke: 'var(--gold)', 'stroke-width': 5, filter: 'drop-shadow(0 0 5px var(--gold))' });
+            const combWaveAnim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            combWaveAnim.setAttribute("attributeName", "d");
+            combWaveAnim.setAttribute("values", `${dComb0};${dComb1};${dComb2};${dComb3};${dComb0}`);
+            combWaveAnim.setAttribute("dur", "4s");
+            combWaveAnim.setAttribute("repeatCount", "indefinite");
+            combWave.appendChild(combWaveAnim);
+            svg.appendChild(combWave);
+
         } else {
-            // Default circle just in case
+            // Default fallback
             svg.appendChild(createSVGElement('circle', { cx: 200, cy: 200, r: 50, fill: 'var(--gold)', opacity: '0.3' }));
         }
     }
 
     function openMudraModal(mudra) {
+        // Show mudra image and reset background
+        modalMudraImg.style.display = 'block';
+        const visualContainer = modalMudraImg.parentElement;
+        if (visualContainer) {
+            visualContainer.style.background = '#fff'; // Standard white background for mudras
+        }
+
         modalMudraImg.src = mudra.image;
         modalMudraName.textContent = mudra.name;
         modalMudraPlacement.textContent = mudra.placement;
@@ -322,6 +749,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         mathModal.style.display = 'none';
         animationOverlay.innerHTML = '';
+        
+        // Restore defaults
+        modalMudraImg.style.display = 'block';
+        const visualContainer = modalMudraImg.parentElement;
+        if (visualContainer) {
+            visualContainer.style.background = '#fff';
+        }
     }
 
     closeModalBtn.addEventListener('click', closeModal);

@@ -1118,6 +1118,7 @@ h1, h2, h3, h4, .cinzel {
     filter: drop-shadow(0 0 20px #fff);
 }
 
+
 /* ════════════════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
    ════════════════════════════════════════════════════════════════ */
@@ -1155,6 +1156,35 @@ h1, h2, h3, h4, .cinzel {
     }
 
     .section-title { font-size: 2rem; }
+
+    /* Math modal responsive layout */
+    .modal-content {
+        width: 95%;
+        height: auto;
+        max-height: 92vh;
+        overflow-y: auto;
+        flex-direction: column;
+    }
+    
+    .modal-body {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .modal-visual-container {
+        width: 100%;
+        height: 350px;
+        flex-shrink: 0;
+    }
+
+    .modal-info-panel {
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+        border-left: none;
+        border-top: 2px solid var(--maroon);
+        padding: 25px;
+    }
 }
 
 /* ── Mobile (≤ 480px) ───────────────────────────────────────── */
